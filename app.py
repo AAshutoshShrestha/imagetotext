@@ -1,38 +1,40 @@
 import streamlit as st
-import pytesseract
 from PIL import Image
 import clipboard
+import numpy as np
+import easyocr as ocr
 
-# Set Tesseract executable path
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# Load OCR model asynchronously
+@st.cache_data(persist=True)
+def load_model(): 
+    return ocr.Reader(['en'], model_storage_directory='.')
 
 def main():
-    st.sidebar.title("Image Text Extractor")
-    
+    st.title("Image Text Extractor")
+    reader = load_model() # Load the OCR model
+
     uploaded_file = st.sidebar.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.sidebar.image(image, caption='Uploaded Image', use_column_width=True)
+        
+        # Perform OCR on resized image
+        text = reader.readtext(np.array(image))
+        result_text = [i[1] for i in text]
+        paragraph = " ".join(result_text)
 
-        text = pytesseract.image_to_string(image)
+        # Format extracted text
+        paragraph = paragraph.replace("- ", "")
+        formatted_text = paragraph.replace('. ', '. ')
+
         st.subheader("Extracted Text:")
-
-        # Remove leading and trailing whitespaces
-        text = text.strip()
-        text = ' '.join(text.split())
-        text = text.replace("- ", "")
-        text = text.replace('\n', '')
-        formatted_text = text.replace('. ', '. ')
-
-        final_text=st.text_area('Final formated outbut ',value=formatted_text, height=400)     
+        final_text = st.text_area('final output',value=formatted_text, height=400)     
         
         # Add a "Copy Text" button
         if st.button('Copy text'):
             clipboard.copy(final_text)
             st.success('Text copied successfully!')
-
-
 
 if __name__ == "__main__":
     main()
