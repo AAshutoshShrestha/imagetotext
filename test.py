@@ -1,7 +1,6 @@
 import streamlit as st
 import pytesseract
 from PIL import Image
-import clipboard
 
 # Set Tesseract executable path
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -26,13 +25,7 @@ def main():
         formatted_text = text.replace('. ', '. ')
 
         final_text=st.text_area('Final formated outbut ',value=formatted_text, height=400)     
-        
-        # Add a "Copy Text" button
-        if st.button('Copy text'):
-            clipboard.copy(final_text)
-            st.success('Text copied successfully!')
-
-
+        st.code(final_text, line_numbers=False)
 
 if __name__ == "__main__":
     main()

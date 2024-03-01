@@ -1,6 +1,5 @@
 import streamlit as st
 from PIL import Image
-import clipboard
 import numpy as np
 import easyocr as ocr
 
@@ -29,12 +28,8 @@ def main():
         formatted_text = paragraph.replace('. ', '. ')
 
         st.subheader("Extracted Text:")
-        final_text = st.text_area('final output',value=formatted_text, height=400)     
-        
-        # Add a "Copy Text" button
-        if st.button('Copy text'):
-            clipboard.copy(final_text)
-            st.success('Text copied successfully!')
+        final_text=  st.text_area('final output',value=formatted_text, height=400)     
+        st.code(final_text, line_numbers=False)     
 
 if __name__ == "__main__":
     main()
